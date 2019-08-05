@@ -1,50 +1,78 @@
 import React from 'react';
 import './../App.css';
 
-class Webcam extends React.Component{
-    constructor(props){
+class Webcam extends React.Component {
+    constructor(props) {
         super(props);
+
+        this.state = {
+            errorMsg: "",
+            buttonLabel: "release stream"
+        }
+
         this.camVideo = React.createRef();
         this.errorMag = React.createRef();
     }
 
-    videoEnded = () =>{
-
-    }
-
-    componentDidMount(){
-        var constraint = window.constraints ={
-            audio:false,
-            video:true
+    videoSwitch = () => {
+        if (window.stream.active === true) {
+            this.endStream();
+        } else {
+            this.startStream();
         }
-
-        //it returns a Promise object
-        console.log(navigator.mediaDevices.getUserMedia(constraint));
-
-        navigator.mediaDevices.getUserMedia(constraint)
-        .then((stream) => {
-
-            console.log(stream);
-            var videoTracks = stream.getVideoTracks();
-            console.log('Got stream with constraints:', constraint);
-            console.log(videoTracks);
-
-            this.camVideo.current.srcObject = stream;
-            this.camVideo.current.play();
-            console.log(this.camVideo)
-        })
-        .catch(function(err){
-            console.log(err.message);
-        })
     }
 
-    render(){
-        
-        return(
+    endStream = () => {
+        window.stream.removeTrack(window.videoTracks[0]);
+        this.camVideo.current.srcObject = window.stream;
+        this.setState({
+            buttonLabel: "create stream"
+        });
+    }
+
+    startStream = () => {
+        //it returns a Promise object
+        navigator.mediaDevices.getUserMedia({ audio: false, video: true })
+            .then((stream) => {
+                console.log(stream);
+                stream.onremovetrack = function () {
+                    console.log('Stream ended');
+                };
+
+                window.stream = stream;
+                window.videoTracks = stream.getVideoTracks();
+                console.log(window.videoTracks);
+                this.camVideo.current.srcObject = stream;
+                this.camVideo.current.play();
+                this.setState({
+                    buttonLabel: "release stream"
+                });
+            })
+            .catch((err) => {
+                this.setState({
+                    errorMsg: "Error message: " + err.message
+                });
+                console.log(err.message);
+            })
+    }
+
+    componentDidMount() {
+        this.startStream();
+    }
+
+    render() {
+        return (
             <div>
-                <video ref={this.camVideo} ></video>
-                <p ref={this.errorMag}></p>
-                <button onClick={this.videoEnded}/>
+                {this.state.errorMsg ? (
+                    <p>{this.state.errorMsg}</p>
+                ) : (
+                    <div>
+                        <video ref={this.camVideo}></video>
+                        <br/>
+                        <button onClick={this.videoSwitch}>{this.state.buttonLabel}</button>
+                    </div>
+                    )
+                }
             </div>
         )
     }
