@@ -34,8 +34,18 @@ class Webcam extends React.Component {
 
     // to start a new video stream
     startStream = () => {
+
+        let constraints = {
+            audio:false,
+            video:{
+                width:{min:640,max:1920},
+                height:{min:400,max:1080},
+                aspectRatio: 1.777777778,
+            }
+        }
+
         //it returns a Promise object
-        navigator.mediaDevices.getUserMedia({ audio: false, video: true })
+        navigator.mediaDevices.getUserMedia(constraints)
             .then((stream) => {
                 console.log(stream);
                 stream.onremovetrack = function () {
@@ -44,7 +54,7 @@ class Webcam extends React.Component {
 
                 window.stream = stream;
                 window.videoTracks = stream.getVideoTracks();
-                console.log(window.videoTracks);
+                console.log("Using device: "+window.videoTracks[0].label);
                 this.camVideo.current.srcObject = stream;
                 this.camVideo.current.play();
                 this.setState({
@@ -68,7 +78,7 @@ class Webcam extends React.Component {
                 {this.state.errorMsg ? (<p> {this.state.errorMsg} </p>) :
                     (
                         <div>
-                            <video ref={this.camVideo}></video>
+                            <video className="webcam" ref={this.camVideo}></video>
                             <br />
                             <button onClick={this.videoSwitch}>{this.state.buttonLabel}</button>
                         </div>

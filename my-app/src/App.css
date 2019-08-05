@@ -2,3 +2,7 @@
   text-align: center;
 }
 
+.webcam{
+  max-width: 90%;
+  max-height: 90%;
+}
