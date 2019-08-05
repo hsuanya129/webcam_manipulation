@@ -11,9 +11,9 @@ class Webcam extends React.Component {
         }
 
         this.camVideo = React.createRef();
-        this.errorMag = React.createRef();
     }
 
+    // to switch on/off video stream
     videoSwitch = () => {
         if (window.stream.active === true) {
             this.endStream();
@@ -22,14 +22,17 @@ class Webcam extends React.Component {
         }
     }
 
+    // to end video stream
     endStream = () => {
+        window.videoTracks[0].stop();
         window.stream.removeTrack(window.videoTracks[0]);
-        this.camVideo.current.srcObject = window.stream;
+        this.camVideo.current.srcObject = null;
         this.setState({
             buttonLabel: "create stream"
         });
     }
 
+    // to start a new video stream
     startStream = () => {
         //it returns a Promise object
         navigator.mediaDevices.getUserMedia({ audio: false, video: true })
@@ -52,7 +55,6 @@ class Webcam extends React.Component {
                 this.setState({
                     errorMsg: "Error message: " + err.message
                 });
-                console.log(err.message);
             })
     }
 
@@ -63,14 +65,13 @@ class Webcam extends React.Component {
     render() {
         return (
             <div>
-                {this.state.errorMsg ? (
-                    <p>{this.state.errorMsg}</p>
-                ) : (
-                    <div>
-                        <video ref={this.camVideo}></video>
-                        <br/>
-                        <button onClick={this.videoSwitch}>{this.state.buttonLabel}</button>
-                    </div>
+                {this.state.errorMsg ? (<p> {this.state.errorMsg} </p>) :
+                    (
+                        <div>
+                            <video ref={this.camVideo}></video>
+                            <br />
+                            <button onClick={this.videoSwitch}>{this.state.buttonLabel}</button>
+                        </div>
                     )
                 }
             </div>
