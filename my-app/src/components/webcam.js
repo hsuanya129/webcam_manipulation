@@ -15,7 +15,7 @@ class Webcam extends React.Component {
 
     // to switch on/off video stream
     videoSwitch = () => {
-        if (window.stream.active === true) {
+        if (this.stream.active === true) {
             this.endStream();
         } else {
             this.startStream();
@@ -24,8 +24,8 @@ class Webcam extends React.Component {
 
     // to end video stream
     endStream = () => {
-        window.videoTracks[0].stop();
-        window.stream.removeTrack(window.videoTracks[0]);
+        this.videoTracks[0].stop();
+        this.stream.removeTrack(this.videoTracks[0]);
         this.camVideo.current.srcObject = null;
         this.setState({
             buttonLabel: "create stream"
@@ -52,9 +52,9 @@ class Webcam extends React.Component {
                     console.log('Stream ended');
                 };
 
-                window.stream = stream;
-                window.videoTracks = stream.getVideoTracks();
-                console.log("Using device: "+window.videoTracks[0].label);
+                this.stream = stream;
+                this.videoTracks = stream.getVideoTracks();
+                console.log("Using device: "+this.videoTracks[0].label);
                 this.camVideo.current.srcObject = stream;
                 this.camVideo.current.play();
                 this.setState({
